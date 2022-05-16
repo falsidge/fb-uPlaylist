@@ -110,35 +110,36 @@ class Window
     width = 0;
     height = 0;
     children:Array<Window> = []
-    constructor()
+    constructor(x = 0,y = 0, width = 0,height = 0)
     {
-
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
-    draw()
+    draw(graphic : GdiGraphics)
     {
         for (const i of this.children)
         {
-            i.draw();
+            i.draw(graphic);
         }
     }
 }
-class Background
+class Background extends Window
 {
     color = Colors.bg
-    constructor()
-    {}
-    draw()
+    draw(graphic : GdiGraphics)
     {
-
+        graphic.FillSolidRect(0, 0, this.width, this.height, this.color);
     }
 }
 class Playlist extends Window
 {
     list: Array<FileInfo> = []
     currentPlaylist: number = 0
-    constructor()
+    constructor(x = 0, y = 0, width = 0, height = 0)
     {
-        super()
+        super(x,y,width,height)
         this.currentPlaylist = plman.ActivePlaylist;
         this.refresh();
     }
@@ -164,47 +165,22 @@ class PlaylistItem
 {
 
 }
-class PlaylistWindow 
+class PlaylistWindow extends Window
 {
     constructor()
     {
-
+        super(0, 0, window.Width, window.Height);
+        this.children.push(new Background(this.x, this.y, this.width, this.height))
+        this.children.push(new Playlist(this.x, this.y, this.height, this.width))
     }
 
 }
-
+const mainWindow = new PlaylistWindow();
 
 function on_paint(graphic : GdiGraphics) {
-	// if (!ww)
-	// 	return;
+    mainWindow.draw(graphic);
+}
 
-	// //gr.FillSolidRect(0, 0, ww, wh, RGBA(210,210,215,255));
-	// // draw background under playlist
-	// if (fb.IsPlaying && g_wallpaperImg && ppt.showwallpaper) {
-	// 	gr.GdiDrawBitmap(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-	// 	gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg & RGBA(255, 255, 255, ppt.wallpaperalpha));
-	// } else {
-	// 	//gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg);
-	// 	if (g_wallpaperImg && ppt.showwallpaper) {
-	// 		gr.GdiDrawBitmap(g_wallpaperImg, 0, 0, ww, wh, 0, 0, g_wallpaperImg.Width, g_wallpaperImg.Height);
-	// 		gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg & RGBA(255, 255, 255, ppt.wallpaperalpha));
-	// 	} else {
-	// 		gr.FillSolidRect(0, 0, ww, wh, g_color_normal_bg);
-	// 	};
-	// };
-
-	// brw && brw.draw(gr);
-
-	// if (pman.offset > 0) {
-	// 	pman.draw(gr);
-	// };
-
-	// if (ppt.showHeaderBar) {
-	// 	// inputBox
-	// 	if (ppt.showFilterBox && g_filterbox) {
-	// 		if (g_filterbox.inputbox.visible) {
-	// 			g_filterbox.draw(gr, 5, 2);
-	// 		};
-	// 	};
-	// };
-};
+function on_size() {
+	
+}
