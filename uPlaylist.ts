@@ -110,6 +110,8 @@ class Window
     width = 0;
     height = 0;
     children:Array<Window> = []
+    parent?: Window
+    name = "Window"
     constructor(x = 0,y = 0, width = 0,height = 0)
     {
         this.x = x;
@@ -123,6 +125,11 @@ class Window
         {
             i.draw(graphic);
         }
+    }
+    add(window: Window)
+    {
+        this.children.push(window)
+        window.parent = this
     }
 }
 class Background extends Window
@@ -167,11 +174,13 @@ class PlaylistItem
 }
 class PlaylistWindow extends Window
 {
+    playlist?: Playlist
     constructor()
     {
         super(0, 0, window.Width, window.Height);
-        this.children.push(new Background(this.x, this.y, this.width, this.height))
-        this.children.push(new Playlist(this.x, this.y, this.height, this.width))
+        this.add(new Background(this.x, this.y, this.width, this.height))
+        this.playlist = new Playlist(this.x, this.y, this.height, this.width)
+        this.add(this.playlist)
     }
 
 }
