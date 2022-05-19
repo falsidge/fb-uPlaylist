@@ -47,7 +47,8 @@ function RGBA(r : number, g : number, b: number, a:number) {
 };
 
 // ^ COMMON API ^
-
+const sortkey = ["album","tracknumber", "title", "path"] //"title",path
+const groupkey = "album" //path 
 const ui_type = window.InstanceType;
 
 const Colors = {
@@ -71,6 +72,7 @@ class FileInfo{
     info: { [key: string] : string | Array<string>} = {}
     meta: { [key: string] : string | Array<string>}  = {}
     handle? : FbMetadbHandle
+    group: string = "?"
     constructor(file_handle : FbMetadbHandle)
     {
 
@@ -92,16 +94,15 @@ class FileInfo{
                 {
                     meta_value.push(file_info.MetaValue(i,j))
                 }
-                this.meta[file_info.MetaName(i)] = meta_value
+                this.meta[file_info.MetaName(i).toLowerCase()] = meta_value
             }
             else
             {
-                this.meta[file_info.MetaName(i)] = file_info.MetaValue(i,0)
+                this.meta[file_info.MetaName(i).toLowerCase()] = file_info.MetaValue(i,0)
             }
         }
         this.handle = file_handle
     }
-
 }
 class Window
 {
@@ -140,9 +141,18 @@ class Background extends Window
         graphic.FillSolidRect(0, 0, this.width, this.height, this.color);
     }
 }
+class PlaylistItem
+{
+
+}
+class PlaylistGroup
+{
+
+}
 class Playlist extends Window
 {
     list: Array<FileInfo> = []
+    groups: Map<string, FileInfo> = new Map()
     currentPlaylist: number = 0
     constructor(x = 0, y = 0, width = 0, height = 0)
     {
@@ -153,6 +163,7 @@ class Playlist extends Window
     refresh()
     {
         this.list = []
+        this.groups = new Map()
         const playlist_items = plman.GetPlaylistItems(this.currentPlaylist)
         for (const i of playlist_items)
         {
@@ -168,10 +179,7 @@ for (const i of new Playlist())
 {
     console.log(i)
 }
-class PlaylistItem
-{
 
-}
 class PlaylistWindow extends Window
 {
     playlist?: Playlist
