@@ -47,8 +47,21 @@ function RGBA(r : number, g : number, b: number, a:number) {
 };
 
 // ^ COMMON API ^
+//album in file     album not in file2 = file < file2
+//album not in file album in file2     = file > file2
+//album in file     album in file2      = 0
+//album not in file album not in file2    = 0
+/* 
+   true true   0
+   true false  < -1
+   false true  >  1
+   false false 0
+*/
+
 const sortkey = ["album","tracknumber", "title", "path"] //"title",path
-const groupkey = "album" //path 
+const exist = (file: FileInfo, x : string, y : string) => (-(x in file.meta) + +(y in file.meta))
+const sortfn = (file : FileInfo, file2: FileInfo) => ((-("album" in file.meta ) + +("album" in file2.meta)) && (<string>file.meta["album"]).localeCompare(<string>file2.meta["album"]) && () )
+const groupkey = (file : FileInfo) => ("album" in file.meta ? file.meta["album"]:file.handle?.Path ?? "?" ) // "album" //path 
 const ui_type = window.InstanceType;
 
 const Colors = {
@@ -167,7 +180,8 @@ class Playlist extends Window
         const playlist_items = plman.GetPlaylistItems(this.currentPlaylist)
         for (const i of playlist_items)
         {
-            this.list.push(new FileInfo(i));
+            const file = new FileInfo(i);
+            this.list.push(file);
         }
     }
     [Symbol.iterator] (){
